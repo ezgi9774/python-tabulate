@@ -1,0 +1,53 @@
+import numpy as np
+from matplotlib import pyplot as plt
+
+def exact(t):
+    return np.arctan(t)
+
+def factorial(x):
+    if x==0:
+        return 1
+    fact = 1
+    for i in range(1,x+1):
+        fact = fact*i
+    return fact
+    
+def taylor(f, a, b, N, IV):
+    h = (b-a)/float(N)
+    t = np.arange(a, b+h, h)
+    x = np.zeros((N+1,))
+    t[0], x[0] = IV
+    for i in range(1,N+1):
+        T = 0
+        for j in range(len(f)):
+            
+            h_factor = h**(j+1)/float(factorial(j+1))
+            T = T + h_factor * f[j]( t[i-1], x[i-1] )
+            x[i] = x[i-1] + T
+            
+    return t, x
+
+a, b = 0.0, 10.0
+N = 200
+h = (b-a)/N
+IV = ( 0.0, 0.0 )
+t = np.arange( a, b+h, h )
+#INPUT YOUR ODE HERE
+f = lambda t, x: np.cos(np.arctan(t))**2
+
+df = lambda t, x: -2*t/(t**2+1)**2
+
+t, x2 = taylor( [ f, df ], a, b, N, IV )
+
+for i in range(len(t)):
+    print('t: ',t[i],'\t\t','x: ',x2[i])
+    
+
+plt.plot( t, exact(t), label='exact' )
+plt.plot( t, x2, label='2nd order' )
+plt.title( "Taylor's Method Example, N="+str(N) )
+plt.xlabel('t')
+plt.ylabel('x(t)')
+plt.legend(loc=4)
+plt.grid()
+plt.show()
